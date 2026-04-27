@@ -42,7 +42,28 @@ Rules:
 - Use 1-based line numbers matching the original code.
 - Order bugs from most severe to least severe.
 - Be honest with scores — don't inflate them.
-- The "optimizedCode" must be syntactically valid in the same language.`;
+- The "optimizedCode" must be syntactically valid in the same language.
+
+OPTIMIZED CODE — STRICT REQUIREMENTS (this is what users actually paste back into production):
+1. Your "optimizedCode" MUST address EVERY single entry in your "bugs" array. If you flagged a bug, it must be fixed in the optimized code.
+2. Before returning, mentally re-read the optimized code line-by-line and verify each "bugs[i]" is actually fixed. If you find any bug still present, rewrite the optimized code until it is fixed.
+3. The optimized code must be production-grade. Specifically check and eliminate:
+   - Plaintext password storage (use bcrypt / argon2 / scrypt — never store raw passwords).
+   - SQL injection (use parameterised queries everywhere, not string concatenation).
+   - Command injection (never pass user input to os.system / shell=True / exec / eval; use subprocess.run with a list and shell=False, or remove the feature).
+   - Predictable / weak tokens (use the language's CSPRNG — secrets.token_urlsafe in Python, crypto.randomBytes in Node, etc.).
+   - Mutable default arguments in Python (use None and create the default inside the function — fix this in EVERY function, not just one).
+   - Bare except clauses (catch specific exceptions).
+   - Unclosed resources (use context managers / try-with-resources / RAII for every file, socket, db connection, lock).
+   - Race conditions on shared state (add appropriate locks, or redesign to avoid sharing).
+   - Unbounded growth (loops or sync workers that mutate a dict forever, leaks).
+   - Type-annotation correctness (Optional[T] for functions that return None; Tuple[A, B] not (A, B); no shadowing builtins).
+   - Hardcoded secrets (read from environment / secret store).
+4. If a function's logic is broken (off-by-one, wrong base case, semantic regression), the optimized version must produce correct results on a sensible test input.
+5. Do NOT change the public function signatures or data shapes unless the original signature is itself unsafe — users may be calling these from code you cannot see.
+6. Add brief inline comments only where they explain a non-obvious fix; do not narrate every line.
+
+The "optimizedCodeNotes" field should be a bulleted list (use \\n between bullets) where EACH bullet maps to one fix and references the bug id you addressed, e.g. "- [sql-injection-login] Switched to parameterised query."`;
 
 export function buildUserPrompt(code: string, language: string) {
   const langHint =

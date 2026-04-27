@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { readSettings, hasUserKey } from "@/lib/byokSettings";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
@@ -100,10 +101,17 @@ export function CodeReviewer() {
     setError(null);
     setResult(null);
     try {
+      const settings = readSettings();
+      const payload: Record<string, unknown> = { code, language };
+      if (hasUserKey(settings)) {
+        payload.provider = settings.provider;
+        payload.model = settings.model;
+        payload.apiKey = settings.apiKey;
+      }
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, language }),
+        body: JSON.stringify(payload),
       });
       const data = (await res.json()) as AnalyzeResponse;
       if (!data.ok || !data.data) {
