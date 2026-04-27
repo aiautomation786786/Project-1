@@ -178,8 +178,10 @@ function codeBlock(c: Cursor, code: string, language: string) {
   }
 
   // Header strip — dark, terminal-style with traffic-light dots
-  ensureSpace(c, 56);
   const headerH = 24;
+  // Reserve enough room for the header AND at least 2 lines of code, so the header
+  // never gets orphaned at the bottom of a page just before a forced page break.
+  ensureSpace(c, headerH + lineH * 2 + innerPadY * 2);
   setFill(c, [30, 41, 59]); // slate-800
   c.doc.roundedRect(MARGIN_X, c.y, PAGE_W - 2 * MARGIN_X, headerH, 6, 6, "F");
   // Square off the bottom of the header so it joins seamlessly with the code body below
