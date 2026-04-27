@@ -22,7 +22,7 @@ const STEPS = [
     icon: FileText,
     title: "3. Learn & improve",
     body:
-      "Browse bugs by severity, see Big-O complexity, copy the optimized version, or download the full report as Markdown.",
+      "Browse bugs by severity, see Big-O complexity, copy the optimized version, or download the full report as PDF.",
     color: "from-emerald-600 to-lime-500",
   },
 ];
