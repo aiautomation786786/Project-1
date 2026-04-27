@@ -45,10 +45,10 @@ function BugCard({ bug, index }: { bug: Bug; index: number }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.05 }}
-      className="glass overflow-hidden rounded-2xl"
+      transition={{ duration: 0.4, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
+      className="glass card-lift overflow-hidden rounded-2xl"
     >
       <button
         onClick={() => setOpen((v) => !v)}
@@ -56,8 +56,9 @@ function BugCard({ bug, index }: { bug: Bug; index: number }) {
       >
         <div
           className={cn(
-            "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ring-1",
+            "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ring-1 transition-transform group-hover:scale-105",
             severityColor(bug.severity),
+            bug.severity === "critical" && "pulse-dot",
           )}
         >
           <Icon className="h-4.5 w-4.5" strokeWidth={2.2} />

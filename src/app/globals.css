@@ -91,6 +91,25 @@ body {
   animation-delay: -11s;
 }
 
+.bg-aurora-orb {
+  position: absolute;
+  width: 36vw;
+  height: 36vw;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.35;
+  background: radial-gradient(circle, #f0abfc, transparent 70%);
+  top: 35%;
+  left: 45%;
+  animation: float 28s ease-in-out infinite;
+  animation-delay: -6s;
+  pointer-events: none;
+}
+[data-theme="dark"] .bg-aurora-orb {
+  background: radial-gradient(circle, #f472b6, transparent 70%);
+  opacity: 0.30;
+}
+
 [data-theme="dark"] .bg-aurora {
   background:
     radial-gradient(ellipse 80% 60% at 50% -10%, rgba(139, 92, 246, 0.18), transparent 60%),
@@ -165,6 +184,39 @@ body {
   background: linear-gradient(135deg, #c084fc 0%, #38bdf8 50%, #f472b6 100%);
   -webkit-background-clip: text;
   background-clip: text;
+}
+
+.gradient-text-shimmer {
+  background: linear-gradient(
+    100deg,
+    #7c3aed 0%,
+    #2563eb 25%,
+    #db2777 50%,
+    #2563eb 75%,
+    #7c3aed 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+[data-theme="dark"] .gradient-text-shimmer {
+  background: linear-gradient(
+    100deg,
+    #c084fc 0%,
+    #38bdf8 25%,
+    #f472b6 50%,
+    #38bdf8 75%,
+    #c084fc 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: -200% 50%; }
 }
 
 .gradient-border {
@@ -364,4 +416,168 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ---------------------------------------------------------------- */
+/* CARD HOVER                                                       */
+/* ---------------------------------------------------------------- */
+.card-lift {
+  position: relative;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease;
+  will-change: transform;
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 24px 48px -16px rgba(124, 58, 237, 0.28);
+}
+[data-theme="dark"] .card-lift:hover {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 24px 48px -12px rgba(139, 92, 246, 0.45);
+}
+
+.card-ring {
+  position: relative;
+  isolation: isolate;
+}
+.card-ring::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0), rgba(2, 132, 199, 0), rgba(219, 39, 119, 0));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease, background 0.4s ease;
+  z-index: 1;
+}
+.card-ring:hover::before {
+  opacity: 1;
+  background: linear-gradient(135deg, #7c3aed, #2563eb, #db2777);
+}
+[data-theme="dark"] .card-ring:hover::before {
+  background: linear-gradient(135deg, #c084fc, #38bdf8, #f472b6);
+}
+
+/* ---------------------------------------------------------------- */
+/* PRIMARY BUTTON                                                   */
+/* ---------------------------------------------------------------- */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.012);
+  filter: brightness(1.06);
+  box-shadow:
+    0 1px 2px rgba(124, 58, 237, 0.3),
+    0 18px 36px -10px rgba(219, 39, 119, 0.55);
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+  filter: brightness(0.96);
+}
+
+/* ---------------------------------------------------------------- */
+/* GLOW                                                             */
+/* ---------------------------------------------------------------- */
+.glow-violet {
+  box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+  transition: box-shadow 0.4s ease;
+}
+.glow-violet:hover {
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.18);
+}
+[data-theme="dark"] .glow-violet:hover {
+  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.28);
+}
+
+/* ---------------------------------------------------------------- */
+/* SCROLL PROGRESS BAR                                              */
+/* ---------------------------------------------------------------- */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  transform-origin: left;
+  background: linear-gradient(90deg, #7c3aed, #2563eb, #db2777);
+  z-index: 60;
+  pointer-events: none;
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.6);
+}
+[data-theme="dark"] .scroll-progress {
+  background: linear-gradient(90deg, #c084fc, #38bdf8, #f472b6);
+  box-shadow: 0 0 12px rgba(192, 132, 252, 0.55);
+}
+
+/* ---------------------------------------------------------------- */
+/* HEADER SCROLL DENSITY                                            */
+/* ---------------------------------------------------------------- */
+.header-scrolled {
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 12px 32px -16px rgba(124, 58, 237, 0.22);
+}
+[data-theme="dark"] .header-scrolled {
+  background: linear-gradient(
+    135deg,
+    rgba(20, 20, 36, 0.95) 0%,
+    rgba(10, 10, 24, 0.92) 100%
+  ) !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 12px 32px -10px rgba(139, 92, 246, 0.45);
+}
+
+/* ---------------------------------------------------------------- */
+/* SHIMMER LOADING                                                  */
+/* ---------------------------------------------------------------- */
+.shimmer-bar {
+  position: relative;
+  overflow: hidden;
+  background: rgba(124, 58, 237, 0.08);
+}
+.shimmer-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(124, 58, 237, 0.18) 50%,
+    transparent 100%
+  );
+  animation: shimmer-sweep 1.6s ease-in-out infinite;
+}
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ---------------------------------------------------------------- */
+/* FOCUS RING                                                       */
+/* ---------------------------------------------------------------- */
+*:focus-visible {
+  outline: 2px solid rgba(124, 58, 237, 0.55);
+  outline-offset: 2px;
+  border-radius: 6px;
 }

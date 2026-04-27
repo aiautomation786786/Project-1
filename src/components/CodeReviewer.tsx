@@ -258,7 +258,7 @@ export function CodeReviewer() {
               <button
                 onClick={analyze}
                 disabled={loading || !code.trim()}
-                className="shine relative flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 px-5 py-3 text-sm font-semibold text-white shadow-xl shadow-violet-500/40 transition-all hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                className="btn-primary shine relative flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white shadow-xl shadow-violet-500/40 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? (
                   <>
