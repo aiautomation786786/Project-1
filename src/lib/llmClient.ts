@@ -111,9 +111,32 @@ export async function chatCompletion(
   }
 }
 
+function isReasoningModel(model: string): boolean {
+  // OpenAI o-series (o1, o1-mini, o1-preview, o3-mini, etc.) reject
+  // `system` role, `temperature`, and `response_format` — they need a
+  // tweaked request shape.
+  return /^o[1-9](-|$)/i.test(model);
+}
+
 async function callOpenAICompatible(
   params: ChatCompletionParams & { baseUrl: string; signal: AbortSignal },
 ): Promise<ChatCompletionResult> {
+  const reasoning = isReasoningModel(params.model);
+  // Reasoning models: collapse system messages into a leading user turn.
+  const messages = reasoning
+    ? collapseSystemIntoUser(params.messages)
+    : params.messages;
+  const body: Record<string, unknown> = {
+    model: params.model,
+    messages,
+  };
+  if (reasoning) {
+    body.max_completion_tokens = params.maxTokens ?? 8192;
+  } else {
+    body.temperature = params.temperature ?? 0.2;
+    body.max_tokens = params.maxTokens ?? 8192;
+    body.response_format = { type: "json_object" };
+  }
   const result = await postJson<OpenAIChatResponse>(
     params.baseUrl,
     {
@@ -122,13 +145,7 @@ async function callOpenAICompatible(
         "Content-Type": "application/json",
         Authorization: `Bearer ${params.apiKey}`,
       },
-      body: JSON.stringify({
-        model: params.model,
-        messages: params.messages,
-        temperature: params.temperature ?? 0.2,
-        max_tokens: params.maxTokens ?? 4096,
-        response_format: { type: "json_object" },
-      }),
+      body: JSON.stringify(body),
     },
     params.signal,
   );
@@ -137,6 +154,22 @@ async function callOpenAICompatible(
   }
   const text = result.data.choices?.[0]?.message?.content ?? "";
   return { text };
+}
+
+function collapseSystemIntoUser(messages: ChatMessage[]): ChatMessage[] {
+  const sys = messages
+    .filter((m) => m.role === "system")
+    .map((m) => m.content)
+    .join("\n\n");
+  const rest = messages.filter((m) => m.role !== "system");
+  if (!sys) return rest;
+  if (rest.length > 0 && rest[0].role === "user") {
+    return [
+      { role: "user", content: `${sys}\n\n${rest[0].content}` },
+      ...rest.slice(1),
+    ];
+  }
+  return [{ role: "user", content: sys }, ...rest];
 }
 
 async function callAnthropic(
@@ -170,7 +203,7 @@ async function callAnthropic(
         system,
         messages: conv,
         temperature: params.temperature ?? 0.2,
-        max_tokens: params.maxTokens ?? 4096,
+        max_tokens: params.maxTokens ?? 8192,
       }),
     },
     signal,
@@ -213,7 +246,7 @@ async function callGemini(
         contents,
         generationConfig: {
           temperature: params.temperature ?? 0.2,
-          maxOutputTokens: params.maxTokens ?? 4096,
+          maxOutputTokens: params.maxTokens ?? 8192,
           responseMimeType: "application/json",
         },
       }),

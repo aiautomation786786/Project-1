@@ -63,7 +63,20 @@ OPTIMIZED CODE — STRICT REQUIREMENTS (this is what users actually paste back i
 5. Do NOT change the public function signatures or data shapes unless the original signature is itself unsafe — users may be calling these from code you cannot see.
 6. Add brief inline comments only where they explain a non-obvious fix; do not narrate every line.
 
-The "optimizedCodeNotes" field should be a bulleted list (use \\n between bullets) where EACH bullet maps to one fix and references the bug id you addressed, e.g. "- [sql-injection-login] Switched to parameterised query."`;
+The "optimizedCodeNotes" field should be a bulleted list (use \\n between bullets) where EACH bullet maps to one fix and references the bug id you addressed, e.g. "- [sql-injection-login] Switched to parameterised query."
+
+FINAL SELF-AUDIT before returning the JSON:
+- Walk through every bug in your "bugs" array, in order. For each bug, point at the line in your "optimizedCode" that fixes it. If you cannot find such a line, REWRITE the optimized code until you can.
+- Independently re-read "optimizedCode" looking for any of these residual issues. If you find one, either fix it AND add a corresponding entry to "bugs", or fix it silently if it was clearly already the intent of one of the existing bugs:
+    a) any function with a mutable default argument ([] or {} as default value)
+    b) any os.system / subprocess(..., shell=True) / eval / exec on user input
+    c) any password column or field stored without hashing
+    d) any token generated from time.time() or a non-cryptographic source
+    e) any database/file/socket opened without a context manager or explicit close
+    f) any shared mutable state mutated by threads without a lock
+    g) any function with a return type annotation that does not match all return paths
+    h) any bare except clause
+- Only after this audit, output the JSON.`;
 
 export function buildUserPrompt(code: string, language: string) {
   const langHint =
