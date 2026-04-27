@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { SettingsButton } from "./SettingsButton";
+import { AuthButton } from "./AuthButton";
 
 export function Header() {
   const { scrollY } = useScroll();
@@ -71,6 +72,7 @@ export function Header() {
           <div className="flex items-center gap-2">
             <SettingsButton />
             <ThemeToggle />
+            <AuthButton />
             <a
               href="#analyze"
               className="glow-violet hidden md:flex items-center gap-2 rounded-lg border border-violet-200 bg-white px-3 py-1.5 text-sm font-medium text-violet-700 hover:bg-violet-50 hover:border-violet-300 transition-colors shadow-sm"
