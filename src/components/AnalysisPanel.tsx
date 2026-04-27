@@ -16,6 +16,7 @@ import { cn, scoreColor } from "@/lib/utils";
 import { BugList } from "./BugList";
 import { ScoreRing } from "./ScoreRing";
 import { CodeEditor } from "./CodeEditor";
+import { downloadPdfReport } from "@/lib/pdfReport";
 
 type Tab = "overview" | "bugs" | "complexity" | "optimized";
 
@@ -41,14 +42,7 @@ export function AnalysisPanel({ result }: Props) {
   };
 
   const handleDownloadReport = () => {
-    const md = buildMarkdownReport(result);
-    const blob = new Blob([md], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `codesage-report-${Date.now()}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadPdfReport(result);
   };
 
   return (
@@ -94,10 +88,10 @@ export function AnalysisPanel({ result }: Props) {
         <button
           onClick={handleDownloadReport}
           className="hidden sm:flex items-center gap-1.5 rounded-lg border border-violet-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-violet-50 hover:text-violet-700 hover:border-violet-300 transition-colors"
-          title="Download analysis as Markdown"
+          title="Download analysis as PDF"
         >
           <Download className="h-3.5 w-3.5" />
-          Report
+          PDF
         </button>
       </div>
 
@@ -305,53 +299,3 @@ export function AnalysisPanel({ result }: Props) {
   );
 }
 
-function buildMarkdownReport(r: AnalysisResult): string {
-  const lines: string[] = [];
-  lines.push(`# CodeSage Analysis Report`);
-  lines.push("");
-  lines.push(`**Language:** ${r.language}`);
-  lines.push("");
-  lines.push(`## Summary`);
-  lines.push(r.summary);
-  lines.push("");
-  lines.push(`## Quality Scores`);
-  lines.push(`- Overall: **${r.scores.overall}/100**`);
-  lines.push(`- Readability: ${r.scores.readability}/100`);
-  lines.push(`- Performance: ${r.scores.performance}/100`);
-  lines.push(`- Security: ${r.scores.security}/100`);
-  lines.push(`- Maintainability: ${r.scores.maintainability}/100`);
-  lines.push("");
-  lines.push(`## Complexity`);
-  lines.push(`- Time: \`${r.complexity.time}\``);
-  lines.push(`- Space: \`${r.complexity.space}\``);
-  lines.push("");
-  lines.push(r.complexity.explanation);
-  if (r.complexity.bottleneck) {
-    lines.push("");
-    lines.push(`**Bottleneck:** ${r.complexity.bottleneck}`);
-  }
-  lines.push("");
-  lines.push(`## Bugs (${r.bugs.length})`);
-  for (const b of r.bugs) {
-    lines.push("");
-    lines.push(
-      `### ${b.title} _(${b.severity}${b.line !== null ? `, line ${b.line}` : ""})_`,
-    );
-    lines.push(`**Category:** ${b.category}`);
-    lines.push("");
-    lines.push(b.description);
-    lines.push("");
-    lines.push(`**Why:** ${b.why}`);
-    lines.push("");
-    lines.push(`**Fix:** ${b.fix}`);
-  }
-  lines.push("");
-  lines.push(`## Optimized Code`);
-  lines.push("```" + r.language);
-  lines.push(r.optimizedCode);
-  lines.push("```");
-  lines.push("");
-  lines.push(`### Notes`);
-  lines.push(r.optimizedCodeNotes);
-  return lines.join("\n");
-}

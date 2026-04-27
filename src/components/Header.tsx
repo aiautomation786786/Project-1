@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Code2, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   return (
@@ -40,13 +41,16 @@ export function Header() {
             </a>
           </nav>
 
-          <a
-            href="#analyze"
-            className="flex items-center gap-2 rounded-lg border border-violet-200 bg-white px-3 py-1.5 text-sm font-medium text-violet-700 hover:bg-violet-50 hover:border-violet-300 transition-colors shadow-sm"
-          >
-            <Code2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Try now</span>
-          </a>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <a
+              href="#analyze"
+              className="flex items-center gap-2 rounded-lg border border-violet-200 bg-white px-3 py-1.5 text-sm font-medium text-violet-700 hover:bg-violet-50 hover:border-violet-300 transition-colors shadow-sm"
+            >
+              <Code2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Try now</span>
+            </a>
+          </div>
         </div>
       </div>
     </motion.header>
