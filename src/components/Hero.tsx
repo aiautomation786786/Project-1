@@ -1,9 +1,37 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, Bug, Cpu, Gauge, Sparkles, Zap } from "lucide-react";
+import { useRef, type MouseEvent } from "react";
 
 export function Hero() {
+  const reduce = useReducedMotion();
+  const ctaRef = useRef<HTMLAnchorElement>(null);
+
+  // Magnetic CTA — button gently follows cursor on hover.
+  const onCtaMove = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (reduce) return;
+    const el = ctaRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const dx = (e.clientX - (rect.left + rect.width / 2)) * 0.18;
+    const dy = (e.clientY - (rect.top + rect.height / 2)) * 0.18;
+    el.style.transform = `translate(${dx}px, ${dy}px) scale(1.02)`;
+  };
+  const onCtaLeave = () => {
+    const el = ctaRef.current;
+    if (el) el.style.transform = "";
+  };
+  const onCtaDown = () => {
+    if (reduce) return;
+    const el = ctaRef.current;
+    if (el) el.style.transform = "translate(0px, 0px) scale(0.97)";
+  };
+  const onCtaUp = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (reduce) return;
+    onCtaMove(e);
+  };
+
   return (
     <section className="relative w-full overflow-hidden pt-16 pb-12 sm:pt-24 sm:pb-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -28,7 +56,7 @@ export function Hero() {
 
           <h1 className="max-w-5xl text-balance text-4xl font-bold tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
             Find bugs.{" "}
-            <span className="gradient-text">Understand them.</span>{" "}
+            <span className="gradient-text-shimmer">Understand them.</span>{" "}
             <br className="hidden sm:block" />
             Ship better code.
           </h1>
@@ -47,18 +75,24 @@ export function Hero() {
             className="mt-10 flex flex-wrap items-center justify-center gap-3"
           >
             <a
+              ref={ctaRef}
               href="#analyze"
-              className="shine relative inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-violet-500/40 transition-transform hover:scale-[1.02]"
+              onMouseMove={onCtaMove}
+              onMouseLeave={onCtaLeave}
+              onMouseDown={onCtaDown}
+              onMouseUp={onCtaUp}
+              className="shine relative inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-600 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-violet-500/40 will-change-transform hover:brightness-110 hover:shadow-2xl hover:shadow-violet-500/50"
+              style={{ transition: "transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, filter 0.25s ease" }}
             >
               <Sparkles className="h-4 w-4" />
               Analyze your code
             </a>
             <a
               href="#how-it-works"
-              className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-violet-50 hover:text-violet-700 hover:border-violet-300 transition-colors shadow-sm"
+              className="group inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-violet-50 hover:text-violet-700 hover:border-violet-300 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
             >
               How it works
-              <ArrowDown className="h-4 w-4" />
+              <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
             </a>
           </motion.div>
 
@@ -77,12 +111,14 @@ export function Hero() {
             ].map((f, i) => (
               <motion.div
                 key={f.label}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.6 + i * 0.08 }}
-                className="glass flex flex-col items-center gap-2 rounded-2xl p-4 transition-transform hover:scale-[1.02]"
+                transition={{ duration: 0.5, delay: 0.55 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                className="group glass card-ring card-lift flex flex-col items-center gap-2 rounded-2xl p-4 cursor-default"
               >
-                <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${f.bg}`}>
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${f.bg} transition-transform duration-300 group-hover:scale-110`}
+                >
                   <f.icon className={`h-5 w-5 ${f.color}`} />
                 </div>
                 <span className="text-xs font-semibold text-slate-700">{f.label}</span>

@@ -50,16 +50,16 @@ export function HowItWorks() {
           {STEPS.map((s, i) => (
             <motion.div
               key={s.title}
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="glass relative overflow-hidden rounded-2xl p-6"
+              transition={{ duration: 0.55, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="group glass card-ring card-lift relative overflow-hidden rounded-2xl p-6"
             >
               <div
-                className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${s.color} shadow-lg`}
+                className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${s.color} shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:shadow-violet-500/40 group-hover:shadow-xl`}
               >
-                <s.icon className="h-6 w-6 text-white" />
+                <s.icon className="h-6 w-6 text-white" strokeWidth={2.2} />
               </div>
               <h3 className="text-lg font-semibold text-slate-900">{s.title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{s.body}</p>
