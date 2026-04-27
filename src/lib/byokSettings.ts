@@ -16,22 +16,38 @@ const KEYS = {
 
 const SETTINGS_EVENT = "codian:settings-changed";
 
+const EMPTY: ByokSettings = { provider: null, model: null, apiKey: null };
+
+// Cache the last-returned object so `readSettings()` is referentially stable
+// when nothing has changed — required for `useSyncExternalStore`'s contract.
+let cached: ByokSettings = EMPTY;
+
 export function readSettings(): ByokSettings {
   if (typeof window === "undefined") {
-    return { provider: null, model: null, apiKey: null };
+    return EMPTY;
   }
+  let next: ByokSettings;
   try {
     const provider = window.localStorage.getItem(KEYS.provider);
     const model = window.localStorage.getItem(KEYS.model);
     const apiKey = window.localStorage.getItem(KEYS.apiKey);
-    return {
+    next = {
       provider: isProviderId(provider) ? provider : null,
       model: model && model.length > 0 ? model : null,
       apiKey: apiKey && apiKey.length > 0 ? apiKey : null,
     };
   } catch {
-    return { provider: null, model: null, apiKey: null };
+    next = EMPTY;
   }
+  if (
+    cached.provider === next.provider &&
+    cached.model === next.model &&
+    cached.apiKey === next.apiKey
+  ) {
+    return cached;
+  }
+  cached = next;
+  return cached;
 }
 
 export function writeSettings(next: ByokSettings) {

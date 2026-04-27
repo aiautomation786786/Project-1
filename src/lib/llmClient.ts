@@ -238,7 +238,7 @@ function friendlyError(status: number, raw: string): string {
   if (status === 429 || lower.includes("rate limit") || lower.includes("quota")) {
     return "Rate limit / quota exceeded on your provider account. Try again shortly or top up.";
   }
-  if (status === 404 || lower.includes("model") && lower.includes("not")) {
+  if (status === 404 || (lower.includes("model") && lower.includes("not"))) {
     return "The selected model is not available on this provider account.";
   }
   if (status === 0) {
