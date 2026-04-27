@@ -161,117 +161,266 @@ function scoreBox(c: Cursor, x: number, y: number, w: number, h: number, label: 
 
 function codeBlock(c: Cursor, code: string, language: string) {
   const size = 9;
-  const lineH = size * 1.4;
-  const lines = code.split("\n");
-  const padding = 10;
-  const totalH = lines.length * lineH + padding * 2 + 18;
-  ensureSpace(c, Math.max(40, Math.min(totalH, FOOTER_Y - c.y - 30)));
+  const lineH = size * 1.45;
+  const innerPadX = 14;
+  const innerPadY = 14;
 
-  setFill(c, COLORS.slate100);
-  setStroke(c, COLORS.slate200);
-  c.doc.setLineWidth(0.5);
-  c.doc.roundedRect(MARGIN_X, c.y, PAGE_W - 2 * MARGIN_X, 18, 4, 4, "FD");
-  c.doc.setFont("helvetica", "bold");
-  c.doc.setFontSize(8);
-  setText(c, COLORS.violet);
-  c.doc.text(language.toUpperCase(), MARGIN_X + 8, c.y + 12);
-  c.y += 18 + 6;
-
+  // Pre-wrap all lines with the courier font so width is accurate
   c.doc.setFont("courier", "normal");
   c.doc.setFontSize(size);
-  setText(c, COLORS.slate900);
-  for (const raw of lines) {
+  const allWrapped: string[] = [];
+  for (const raw of code.split("\n")) {
     const wrapped = c.doc.splitTextToSize(
-      raw || " ",
-      PAGE_W - 2 * MARGIN_X - 8,
+      raw.length === 0 ? " " : raw,
+      PAGE_W - 2 * MARGIN_X - innerPadX * 2,
     ) as string[];
-    for (const w of wrapped) {
-      ensureSpace(c, lineH);
-      c.doc.text(w, MARGIN_X + 4, c.y);
-      c.y += lineH;
+    allWrapped.push(...(wrapped.length ? wrapped : [" "]));
+  }
+
+  // Header strip — dark, terminal-style with traffic-light dots
+  ensureSpace(c, 56);
+  const headerH = 24;
+  setFill(c, [30, 41, 59]); // slate-800
+  c.doc.roundedRect(MARGIN_X, c.y, PAGE_W - 2 * MARGIN_X, headerH, 6, 6, "F");
+  // Square off the bottom of the header so it joins seamlessly with the code body below
+  setFill(c, [30, 41, 59]);
+  c.doc.rect(MARGIN_X, c.y + headerH - 6, PAGE_W - 2 * MARGIN_X, 6, "F");
+
+  // Traffic-light dots
+  const dotsY = c.y + headerH / 2;
+  setFill(c, [248, 113, 113]);
+  c.doc.circle(MARGIN_X + 14, dotsY, 3.2, "F");
+  setFill(c, [251, 191, 36]);
+  c.doc.circle(MARGIN_X + 26, dotsY, 3.2, "F");
+  setFill(c, [74, 222, 128]);
+  c.doc.circle(MARGIN_X + 38, dotsY, 3.2, "F");
+
+  // Language label
+  c.doc.setFont("helvetica", "bold");
+  c.doc.setFontSize(8);
+  setText(c, [203, 213, 225]); // slate-300
+  c.doc.text(
+    language.toUpperCase(),
+    PAGE_W - MARGIN_X - 12,
+    dotsY + 3,
+    { align: "right" },
+  );
+
+  c.y += headerH;
+
+  // Render lines, painting a slate100 background slab per page so the code reads as a proper block
+  let i = 0;
+  while (i < allWrapped.length) {
+    const segStart = c.y;
+    const available = FOOTER_Y - 24 - segStart;
+    if (available < lineH * 2 + innerPadY * 2) {
+      newPage(c);
+      continue;
+    }
+    const linesThisPage = Math.min(
+      allWrapped.length - i,
+      Math.floor((available - innerPadY * 2) / lineH),
+    );
+    const segH = linesThisPage * lineH + innerPadY * 2;
+
+    // Background slab
+    setFill(c, [248, 250, 252]); // slate-50
+    setStroke(c, COLORS.slate200);
+    c.doc.setLineWidth(0.5);
+    c.doc.rect(MARGIN_X, segStart, PAGE_W - 2 * MARGIN_X, segH, "F");
+    // Left accent rail
+    setFill(c, COLORS.violet);
+    c.doc.rect(MARGIN_X, segStart, 3, segH, "F");
+
+    c.doc.setFont("courier", "normal");
+    c.doc.setFontSize(size);
+    setText(c, [15, 23, 42]); // slate-900
+
+    let lineY = segStart + innerPadY + lineH - 2;
+    for (let k = 0; k < linesThisPage; k++) {
+      c.doc.text(allWrapped[i + k], MARGIN_X + innerPadX, lineY);
+      lineY += lineH;
+    }
+    i += linesThisPage;
+    c.y = segStart + segH;
+
+    if (i < allWrapped.length) {
+      newPage(c);
     }
   }
-  c.y += 8;
+  c.y += 14;
+}
+
+function gradeLetter(score: number): string {
+  if (score >= 90) return "A";
+  if (score >= 80) return "B";
+  if (score >= 70) return "C";
+  if (score >= 60) return "D";
+  return "F";
 }
 
 function coverPage(c: Cursor, r: AnalysisResult) {
+  // Soft lavender canvas
   setFill(c, [247, 244, 255]);
   c.doc.rect(0, 0, PAGE_W, PAGE_H, "F");
 
-  // gradient-ish band
+  // Top brand band — violet over fuchsia for a faux-gradient
   setFill(c, COLORS.violet);
-  c.doc.rect(0, 0, PAGE_W, 6, "F");
+  c.doc.rect(0, 0, PAGE_W, 8, "F");
+  setFill(c, COLORS.fuchsia);
+  c.doc.rect(0, 8, PAGE_W, 2, "F");
 
-  c.y = 110;
+  // Branded header bar
+  const headerY = 56;
+  // Logo mark
+  setFill(c, COLORS.violet);
+  c.doc.roundedRect(MARGIN_X, headerY - 14, 26, 26, 7, 7, "F");
   c.doc.setFont("helvetica", "bold");
-  c.doc.setFontSize(12);
-  setText(c, COLORS.violet);
-  c.doc.text("CODIAN", MARGIN_X, c.y);
+  c.doc.setFontSize(15);
+  setText(c, COLORS.white);
+  c.doc.text("C", MARGIN_X + 13, headerY + 4, { align: "center" });
+
+  // Wordmark
+  c.doc.setFont("helvetica", "bold");
+  c.doc.setFontSize(17);
+  setText(c, COLORS.slate900);
+  c.doc.text("Codian", MARGIN_X + 38, headerY + 4);
+
+  // Tagline
+  c.doc.setFont("helvetica", "normal");
+  c.doc.setFontSize(10);
+  setText(c, COLORS.slate500);
+  c.doc.text(
+    "AI Code Reviewer & Bug Explainer",
+    MARGIN_X + 100,
+    headerY + 4,
+  );
+
+  // Hairline separator
+  setStroke(c, COLORS.slate200);
+  c.doc.setLineWidth(0.5);
+  c.doc.line(MARGIN_X, headerY + 22, PAGE_W - MARGIN_X, headerY + 22);
+
+  // Title
+  c.doc.setFont("helvetica", "bold");
+  c.doc.setFontSize(36);
+  setText(c, COLORS.slate900);
+  c.doc.text("Code Analysis Report", MARGIN_X, 160);
+
+  // Subtitle pill — date · language · issues
+  const dateStr = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const issueWord = r.bugs.length === 1 ? "issue" : "issues";
+  const subtitle = `${dateStr}    ·    ${r.language}    ·    ${r.bugs.length} ${issueWord} found`;
   c.doc.setFont("helvetica", "normal");
   c.doc.setFontSize(11);
   setText(c, COLORS.slate500);
-  c.doc.text("AI Code Reviewer & Bug Explainer", MARGIN_X, c.y + 18);
+  c.doc.text(subtitle, MARGIN_X, 184);
 
-  c.doc.setFont("helvetica", "bold");
-  c.doc.setFontSize(34);
-  setText(c, COLORS.slate900);
-  c.doc.text("Code Analysis Report", MARGIN_X, c.y + 80);
-
-  // Score ring on the right column — drawn first so summary text never overlaps it
-  const ringX = PAGE_W - MARGIN_X - 110;
-  const summaryWidth = ringX - MARGIN_X - 20;
-
-  c.doc.setFont("helvetica", "normal");
-  c.doc.setFontSize(13);
-  setText(c, COLORS.slate700);
-  const summary = c.doc.splitTextToSize(r.summary, summaryWidth) as string[];
-  let yy = c.y + 120;
-  for (const line of summary.slice(0, 12)) {
-    c.doc.text(line, MARGIN_X, yy);
-    yy += 18;
-  }
-  const ringY = c.y + 200;
+  // Centered score ring with grade letter
+  const cx = PAGE_W / 2;
+  const ringCY = 320;
+  const ringR = 64;
   setFill(c, COLORS.white);
   setStroke(c, scoreColor(r.scores.overall));
-  c.doc.setLineWidth(6);
-  c.doc.circle(ringX + 55, ringY + 55, 50, "FD");
-  c.doc.setFont("helvetica", "bold");
-  c.doc.setFontSize(36);
-  setText(c, scoreColor(r.scores.overall));
-  c.doc.text(String(r.scores.overall), ringX + 55, ringY + 65, { align: "center" });
-  c.doc.setFont("helvetica", "bold");
-  c.doc.setFontSize(8);
-  setText(c, COLORS.slate500);
-  c.doc.text("OVERALL SCORE", ringX + 55, ringY + 130, { align: "center" });
+  c.doc.setLineWidth(8);
+  c.doc.circle(cx, ringCY, ringR, "FD");
 
-  // meta block
+  c.doc.setFont("helvetica", "bold");
+  c.doc.setFontSize(54);
+  setText(c, scoreColor(r.scores.overall));
+  c.doc.text(String(r.scores.overall), cx, ringCY + 10, { align: "center" });
+
+  c.doc.setFont("helvetica", "normal");
+  c.doc.setFontSize(10);
+  setText(c, COLORS.slate500);
+  c.doc.text("/ 100", cx, ringCY + 30, { align: "center" });
+
+  // Grade
+  c.doc.setFont("helvetica", "bold");
+  c.doc.setFontSize(9);
+  setText(c, COLORS.slate500);
+  c.doc.text("OVERALL GRADE", cx, ringCY + 100, { align: "center" });
+  c.doc.setFont("helvetica", "bold");
+  c.doc.setFontSize(28);
+  setText(c, scoreColor(r.scores.overall));
+  c.doc.text(gradeLetter(r.scores.overall), cx, ringCY + 128, {
+    align: "center",
+  });
+
+  // Executive summary card
+  const summaryY = 470;
+  const summaryW = PAGE_W - 2 * MARGIN_X;
+  c.doc.setFont("helvetica", "normal");
+  c.doc.setFontSize(11);
+  const summaryLines = c.doc.splitTextToSize(
+    r.summary,
+    summaryW - 32,
+  ) as string[];
+  const visibleLines = summaryLines.slice(0, 6);
+  const cardH = visibleLines.length * 15 + 50;
+
   setFill(c, COLORS.white);
   setStroke(c, COLORS.slate200);
   c.doc.setLineWidth(0.5);
-  c.doc.roundedRect(MARGIN_X, PAGE_H - 200, PAGE_W - 2 * MARGIN_X, 110, 6, 6, "FD");
+  c.doc.roundedRect(MARGIN_X, summaryY, summaryW, cardH, 8, 8, "FD");
+  // Left accent bar
+  setFill(c, COLORS.violet);
+  c.doc.rect(MARGIN_X, summaryY, 3, cardH, "F");
 
   c.doc.setFont("helvetica", "bold");
-  c.doc.setFontSize(9);
-  setText(c, COLORS.slate500);
-  c.doc.text("LANGUAGE", MARGIN_X + 16, PAGE_H - 175);
-  c.doc.text("BUGS DETECTED", MARGIN_X + 180, PAGE_H - 175);
-  c.doc.text("TIME COMPLEXITY", MARGIN_X + 320, PAGE_H - 175);
-
-  c.doc.setFont("helvetica", "bold");
-  c.doc.setFontSize(16);
-  setText(c, COLORS.slate900);
-  c.doc.text(r.language, MARGIN_X + 16, PAGE_H - 152);
-  c.doc.text(String(r.bugs.length), MARGIN_X + 180, PAGE_H - 152);
-  c.doc.text(r.complexity.time, MARGIN_X + 320, PAGE_H - 152);
+  c.doc.setFontSize(8);
+  setText(c, COLORS.violet);
+  c.doc.text("EXECUTIVE SUMMARY", MARGIN_X + 16, summaryY + 20);
 
   c.doc.setFont("helvetica", "normal");
-  c.doc.setFontSize(9);
-  setText(c, COLORS.slate500);
-  c.doc.text(
-    `Generated ${new Date().toLocaleString()}`,
-    MARGIN_X + 16,
-    PAGE_H - 110,
-  );
+  c.doc.setFontSize(11);
+  setText(c, COLORS.slate700);
+  let yy = summaryY + 40;
+  for (const line of visibleLines) {
+    c.doc.text(line, MARGIN_X + 16, yy);
+    yy += 15;
+  }
+
+  // Meta block at bottom — 4 columns
+  const metaY = PAGE_H - 130;
+  const metaH = 70;
+  setFill(c, COLORS.white);
+  setStroke(c, COLORS.slate200);
+  c.doc.setLineWidth(0.5);
+  c.doc.roundedRect(MARGIN_X, metaY, PAGE_W - 2 * MARGIN_X, metaH, 8, 8, "FD");
+
+  const metaCols = [
+    { label: "LANGUAGE", value: r.language },
+    { label: "BUGS DETECTED", value: String(r.bugs.length) },
+    { label: "TIME COMPLEXITY", value: r.complexity.time },
+    { label: "SPACE COMPLEXITY", value: r.complexity.space },
+  ];
+  const colW = (PAGE_W - 2 * MARGIN_X) / metaCols.length;
+  metaCols.forEach((m, i) => {
+    const xCenter = MARGIN_X + i * colW + colW / 2;
+    c.doc.setFont("helvetica", "bold");
+    c.doc.setFontSize(8);
+    setText(c, COLORS.slate500);
+    c.doc.text(m.label, xCenter, metaY + 22, { align: "center" });
+    c.doc.setFont("helvetica", "bold");
+    c.doc.setFontSize(15);
+    setText(c, COLORS.slate900);
+    c.doc.text(m.value, xCenter, metaY + 48, { align: "center" });
+    if (i < metaCols.length - 1) {
+      setStroke(c, COLORS.slate200);
+      c.doc.setLineWidth(0.5);
+      c.doc.line(
+        MARGIN_X + (i + 1) * colW,
+        metaY + 12,
+        MARGIN_X + (i + 1) * colW,
+        metaY + metaH - 12,
+      );
+    }
+  });
 
   newPage(c);
 }
