@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ScrollProgress } from "@/components/ScrollProgress";
@@ -41,20 +42,36 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable}`}
-      suppressHydrationWarning
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: "#7c3aed",
+          colorTextOnPrimaryBackground: "#ffffff",
+          borderRadius: "0.625rem",
+          fontFamily: "var(--font-geist-sans)",
+        },
+        elements: {
+          formButtonPrimary:
+            "bg-gradient-to-br from-violet-600 to-fuchsia-500 hover:brightness-110",
+          card: "shadow-xl",
+        },
+      }}
     >
-      <body className="antialiased">
-        <ThemeProvider>
-          <ScrollProgress />
-          <div className="bg-aurora" aria-hidden>
-            <div className="bg-aurora-orb" />
-          </div>
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
+      <html
+        lang="en"
+        className={`${geistSans.variable} ${geistMono.variable}`}
+        suppressHydrationWarning
+      >
+        <body className="antialiased">
+          <ThemeProvider>
+            <ScrollProgress />
+            <div className="bg-aurora" aria-hidden>
+              <div className="bg-aurora-orb" />
+            </div>
+            {children}
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

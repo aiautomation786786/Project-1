@@ -18,6 +18,7 @@
 - **15+ languages** — Python, JavaScript, TypeScript, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, SQL, and more.
 - **Light & dark themes** — fully themed UI with persistent toggle.
 - **Professional PDF reports** — branded multi-page PDF with cover, scores, bugs, complexity, and the optimized code.
+- **Optional sign-in** — Clerk-powered auth for visitors who want it; anonymous use still works without an account.
 
 ## How it works
 
@@ -69,10 +70,12 @@ npm start
 
 ### Environment variables
 
-| Var             | Required | Description                                              |
-| --------------- | -------- | -------------------------------------------------------- |
-| `GROQ_API_KEY`  | yes      | Inference provider API key                               |
-| `GROQ_MODEL`    | no       | Model id (default `llama-3.3-70b-versatile`)             |
+| Var                                    | Required | Description                                                            |
+| -------------------------------------- | -------- | ---------------------------------------------------------------------- |
+| `GROQ_API_KEY`                         | yes      | Server-side fallback inference key (used when visitor hasn't set BYOK) |
+| `GROQ_MODEL`                           | no       | Model id (default `llama-3.3-70b-versatile`)                           |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`    | yes      | Clerk publishable key (sign-in)                                        |
+| `CLERK_SECRET_KEY`                     | yes      | Clerk secret key (sign-in)                                             |
 
 ## Tech stack
 
