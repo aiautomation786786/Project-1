@@ -21,7 +21,7 @@ export function Header() {
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-lg font-bold tracking-tight text-slate-900">
-                Code<span className="gradient-text">Sage</span>
+                Cod<span className="gradient-text">ian</span>
               </span>
               <span className="text-[10px] uppercase tracking-widest text-slate-500">
                 AI Code Reviewer

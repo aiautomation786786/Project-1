@@ -8,14 +8,14 @@ const STEPS = [
     icon: ClipboardPaste,
     title: "1. Paste your code",
     body:
-      "Drop in a snippet (or upload a file). CodeSage supports 15+ languages including Python, JS/TS, Java, C/C++, Go and Rust.",
+      "Drop in a snippet (or upload a file). Codian supports 15+ languages including Python, JS/TS, Java, C/C++, Go and Rust.",
     color: "from-violet-600 to-fuchsia-500",
   },
   {
     icon: BrainCircuit,
     title: "2. AI reviews it",
     body:
-      "Llama 3.3 70B (via Groq) reads it like a senior engineer — finds bugs, explains why they happen, and rewrites the code.",
+      "Codian reads it like a senior engineer — finds bugs, explains why they happen, and rewrites the code the optimized way.",
     color: "from-sky-600 to-cyan-500",
   },
   {
@@ -39,7 +39,7 @@ export function HowItWorks() {
           className="mb-12 text-center"
         >
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-            How <span className="gradient-text">CodeSage</span> works
+            How <span className="gradient-text">Codian</span> works
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-slate-600 sm:text-base">
             From paste to professional review in under 10 seconds.

@@ -12,7 +12,7 @@ export function ThemeProvider({
       attribute="data-theme"
       defaultTheme="light"
       enableSystem={false}
-      storageKey="codesage-theme"
+      storageKey="codian-theme"
       {...props}
     >
       {children}

@@ -14,22 +14,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CodeSage — AI Code Reviewer & Bug Explainer",
+  title: "Codian — AI Code Reviewer & Bug Explainer",
   description:
-    "Paste your code, get instant AI-powered bug detection, complexity analysis, and an optimized version — explained line-by-line. Built for students and developers.",
+    "Paste your code and get instant AI-powered bug detection, complexity analysis, and an optimized version — explained line-by-line.",
   keywords: [
     "AI code review",
     "bug explainer",
     "code analyzer",
-    "LLM",
-    "Groq",
-    "Llama",
     "complexity analysis",
     "Big-O",
+    "static analysis",
   ],
-  authors: [{ name: "CodeSage" }],
+  authors: [{ name: "Codian" }],
   openGraph: {
-    title: "CodeSage — AI Code Reviewer",
+    title: "Codian — AI Code Reviewer",
     description:
       "Instant AI-powered code review, bug explanations and optimization suggestions.",
     type: "website",

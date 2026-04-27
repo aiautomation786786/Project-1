@@ -319,7 +319,7 @@ export function CodeReviewer() {
                       <Sparkles className="h-7 w-7 text-white" />
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900">CodeSage is thinking…</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">Codian is thinking…</h3>
                   <p className="mt-1 max-w-sm text-sm text-slate-600">
                     Reading your code, hunting for bugs, calculating complexity, and
                     drafting an optimized version.

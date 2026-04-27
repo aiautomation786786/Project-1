@@ -1,64 +1,56 @@
-# CodeSage — AI Code Reviewer & Bug Explainer
+# Codian — AI Code Reviewer & Bug Explainer
 
 > **Find bugs. Understand them. Ship better code.**
-> A generative-AI web app that reviews your code, explains *why* it's buggy,
-> analyses time/space complexity, and rewrites it the optimized way — built
-> for students learning to code.
+> An AI-powered web app that reviews your code, explains *why* it's buggy,
+> analyses time/space complexity, and rewrites it the optimized way.
 
-![Built with Next.js 16](https://img.shields.io/badge/Next.js-16-black) ![React 19](https://img.shields.io/badge/React-19-149eca) ![Tailwind 4](https://img.shields.io/badge/Tailwind-4-38bdf8) ![Llama 3.3 70B](https://img.shields.io/badge/Llama_3.3-70B-8b5cf6)
+![Next.js](https://img.shields.io/badge/Next.js-16-black) ![React](https://img.shields.io/badge/React-19-149eca) ![Tailwind](https://img.shields.io/badge/Tailwind-4-38bdf8) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6)
 
 ---
 
-## ✨ Features
+## Features
 
 - **Bug detection** — finds critical / warning / info-level issues with line numbers.
 - **Why explanations** — every bug comes with an *educational* explanation, not just "this is wrong".
 - **Big-O complexity analysis** — time + space complexity with the bottleneck called out.
-- **Quality scoring** — 0–100 scores for readability, performance, security, maintainability and an overall grade.
+- **Quality scoring** — 0–100 scores for readability, performance, security, maintainability, and overall.
 - **Optimized version** — refactored, working code in the same language with notes on what changed.
 - **15+ languages** — Python, JavaScript, TypeScript, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, SQL, and more.
-- **Beautiful UI** — Monaco editor, animated gradients, glassmorphism, smooth Framer-Motion transitions.
-- **Downloadable Markdown report** — handy for assignments and code-review records.
+- **Light & dark themes** — fully themed UI with persistent toggle.
+- **Professional PDF reports** — branded multi-page PDF with cover, scores, bugs, complexity, and the optimized code.
 
-## 🧠 How the AI works
+## How it works
 
-CodeSage sends your code to **Llama 3.3 70B** running on **Groq**'s ultra-low-latency LPU infrastructure. A carefully engineered system prompt forces the model to respond with strict JSON describing:
+Codian uses a large language model with a strict-JSON system prompt to produce structured analysis: detected language, bugs (severity, line, category, description, *why*, fix), complexity (time + space) with bottleneck, quality scores, and an optimized rewrite with change notes. The Next.js server normalizes and validates the response, then the React UI renders it as a tabbed analysis panel.
 
-- detected language
-- a list of bugs (severity, line, category, description, *why*, fix)
-- complexity (time + space) with explanation and bottleneck
-- quality scores
-- an optimized rewrite of the code with change notes
-
-The server normalizes and validates the response, then the React UI renders it as a tabbed analysis panel.
-
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌──────────────────────────┐         ┌──────────────────────────┐
-│      Next.js Client      │◀──────▶│    Next.js API Route     │
-│  (React 19 + Monaco UI)  │  JSON   │   /api/analyze (Node)    │
+│      Next.js Client      │◀───────▶│    Next.js API Route     │
+│  (React 19 + Monaco UI)  │  JSON   │      /api/analyze        │
 └──────────────────────────┘         └────────────┬─────────────┘
-                                                  │ groq-sdk
+                                                  │
                                                   ▼
                                      ┌──────────────────────────┐
-                                     │   Groq · Llama 3.3 70B   │
+                                     │   AI Inference Backend   │
                                      └──────────────────────────┘
 ```
 
 - **UI:** `src/app/page.tsx` + `src/components/*` (client components, Framer Motion animations)
-- **Editor:** Monaco (`@monaco-editor/react`) with custom CodeSage dark theme
+- **Editor:** Monaco (`@monaco-editor/react`) with custom Codian light & dark themes
 - **Backend:** `src/app/api/analyze/route.ts` — Node runtime, JSON-only response, safe error handling
-- **LLM:** `src/lib/prompt.ts` — strict JSON system prompt + user prompt builder
+- **Prompt:** `src/lib/prompt.ts` — strict JSON system prompt + user prompt builder
 - **Types:** `src/lib/types.ts` — fully typed with TypeScript
+- **PDF reports:** `src/lib/pdfReport.ts` — branded multi-page export via `jspdf`
 
-## 🚀 Getting started
+## Getting started
 
 ```bash
 # 1. Install dependencies
 npm install
 
-# 2. Configure your Groq key
+# 2. Configure your inference API key
 cp .env.example .env.local
 # then edit .env.local and paste your GROQ_API_KEY
 # (free key at https://console.groq.com/keys)
@@ -79,10 +71,10 @@ npm start
 
 | Var             | Required | Description                                              |
 | --------------- | -------- | -------------------------------------------------------- |
-| `GROQ_API_KEY`  | yes      | Your Groq API key                                        |
+| `GROQ_API_KEY`  | yes      | Inference provider API key                               |
 | `GROQ_MODEL`    | no       | Model id (default `llama-3.3-70b-versatile`)             |
 
-## 📦 Tech stack
+## Tech stack
 
 | Layer       | Choice                                                |
 | ----------- | ----------------------------------------------------- |
@@ -92,41 +84,34 @@ npm start
 | Animations  | Framer Motion                                         |
 | Editor      | Monaco (`@monaco-editor/react`)                       |
 | Icons       | lucide-react                                          |
-| LLM SDK     | `groq-sdk` (OpenAI-compatible)                        |
+| PDF export  | jsPDF                                                 |
+| Theme       | next-themes (light + dark with toggle)                |
 | Deploy      | Vercel-style static + edge / any Node host            |
 
-## 🧪 Try it instantly
+## Try it instantly
 
-The home page comes preloaded with three buggy samples (Python fibonacci, JS async race, C++ buffer overflow) so you can see the reviewer in action before pasting your own code.
+The home page comes preloaded with three buggy samples (Python fibonacci, JavaScript async race, C++ buffer overflow) so you can see the reviewer in action before pasting your own code.
 
-## 📁 Project structure
+## Project structure
 
 ```
-codesage/
+codian/
 ├─ src/
 │  ├─ app/
-│  │  ├─ api/analyze/route.ts   ← Groq-powered analysis endpoint
-│  │  ├─ globals.css            ← Tailwind + custom theme
+│  │  ├─ api/analyze/route.ts   ← AI-powered analysis endpoint
+│  │  ├─ globals.css            ← Tailwind + theme tokens
 │  │  ├─ layout.tsx
 │  │  └─ page.tsx
 │  ├─ components/               ← UI components (Hero, Editor, AnalysisPanel, …)
 │  └─ lib/
 │     ├─ prompt.ts              ← LLM system + user prompts
-│     ├─ types.ts               ← shared interfaces
+│     ├─ pdfReport.ts           ← Branded PDF export
+│     ├─ types.ts
 │     └─ utils.ts
-├─ .env.example
-├─ next.config.ts
+├─ public/
 └─ package.json
 ```
 
-## 🗺️ Roadmap / limitations
+## License
 
-- Larger code → chunked analysis (currently capped at 20,000 chars).
-- Multi-file project review.
-- Inline highlighting on the original editor (currently shows line numbers in bug cards).
-- User accounts + history.
-- Streaming responses for faster feedback.
-
-## 📄 License
-
-MIT — built for educational / university-project use.
+© Codian. All rights reserved.
