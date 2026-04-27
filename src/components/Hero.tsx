@@ -17,25 +17,25 @@ export function Hero() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-500/10 px-3.5 py-1.5 text-xs font-medium text-violet-200 backdrop-blur"
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-300/60 bg-white/70 px-3.5 py-1.5 text-xs font-semibold text-violet-700 backdrop-blur shadow-sm"
           >
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-400" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-500 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-600" />
             </span>
             Powered by Llama 3.3 70B via Groq
           </motion.div>
 
-          <h1 className="max-w-5xl text-balance text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
+          <h1 className="max-w-5xl text-balance text-4xl font-bold tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
             Find bugs.{" "}
             <span className="gradient-text">Understand them.</span>{" "}
             <br className="hidden sm:block" />
             Ship better code.
           </h1>
 
-          <p className="mt-6 max-w-2xl text-balance text-base text-white/60 sm:text-lg">
+          <p className="mt-6 max-w-2xl text-balance text-base text-slate-600 sm:text-lg">
             Paste any code snippet — CodeSage&apos;s AI reviewer detects bugs,
-            explains <em className="text-white/80 not-italic font-medium">why</em> they
+            explains <em className="text-slate-900 not-italic font-semibold">why</em> they
             happen, analyses time and space complexity, and rewrites it the optimized
             way. Built for students learning to code.
           </p>
@@ -48,14 +48,14 @@ export function Hero() {
           >
             <a
               href="#analyze"
-              className="shine relative inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-violet-500/30 transition-transform hover:scale-[1.02]"
+              className="shine relative inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-violet-500/40 transition-transform hover:scale-[1.02]"
             >
               <Sparkles className="h-4 w-4" />
               Analyze your code
             </a>
             <a
               href="#how-it-works"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-violet-50 hover:text-violet-700 hover:border-violet-300 transition-colors shadow-sm"
             >
               How it works
               <ArrowDown className="h-4 w-4" />
@@ -70,10 +70,10 @@ export function Hero() {
             className="mt-16 grid w-full max-w-5xl grid-cols-2 gap-4 sm:grid-cols-4"
           >
             {[
-              { icon: Bug, label: "Bug Detection", color: "text-rose-400" },
-              { icon: Zap, label: "Why Explanations", color: "text-amber-400" },
-              { icon: Gauge, label: "Big-O Analysis", color: "text-sky-400" },
-              { icon: Cpu, label: "Optimized Code", color: "text-emerald-400" },
+              { icon: Bug, label: "Bug Detection", color: "text-rose-600", bg: "bg-rose-100" },
+              { icon: Zap, label: "Why Explanations", color: "text-amber-600", bg: "bg-amber-100" },
+              { icon: Gauge, label: "Big-O Analysis", color: "text-sky-600", bg: "bg-sky-100" },
+              { icon: Cpu, label: "Optimized Code", color: "text-emerald-600", bg: "bg-emerald-100" },
             ].map((f, i) => (
               <motion.div
                 key={f.label}
@@ -82,8 +82,10 @@ export function Hero() {
                 transition={{ duration: 0.4, delay: 0.6 + i * 0.08 }}
                 className="glass flex flex-col items-center gap-2 rounded-2xl p-4 transition-transform hover:scale-[1.02]"
               >
-                <f.icon className={`h-5 w-5 ${f.color}`} />
-                <span className="text-xs font-medium text-white/80">{f.label}</span>
+                <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${f.bg}`}>
+                  <f.icon className={`h-5 w-5 ${f.color}`} />
+                </div>
+                <span className="text-xs font-semibold text-slate-700">{f.label}</span>
               </motion.div>
             ))}
           </motion.div>

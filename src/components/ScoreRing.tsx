@@ -25,7 +25,7 @@ export function ScoreRing({ score, label = "Overall", size = 140 }: Props) {
           cy={size / 2}
           r={radius}
           strokeWidth={8}
-          className="fill-none stroke-white/10"
+          className="fill-none stroke-slate-200"
         />
         <motion.circle
           cx={size / 2}
@@ -41,7 +41,7 @@ export function ScoreRing({ score, label = "Overall", size = 140 }: Props) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className={`text-3xl font-bold ${scoreColor(score)}`}>{score}</span>
-        <span className="text-[10px] uppercase tracking-widest text-white/50">
+        <span className="text-[10px] uppercase tracking-widest font-semibold text-slate-500">
           {label}
         </span>
       </div>
