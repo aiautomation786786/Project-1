@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CodeSage — AI Code Reviewer & Bug Explainer
 
-## Getting Started
+> **Find bugs. Understand them. Ship better code.**
+> A generative-AI web app that reviews your code, explains *why* it's buggy,
+> analyses time/space complexity, and rewrites it the optimized way — built
+> for students learning to code.
 
-First, run the development server:
+![Built with Next.js 16](https://img.shields.io/badge/Next.js-16-black) ![React 19](https://img.shields.io/badge/React-19-149eca) ![Tailwind 4](https://img.shields.io/badge/Tailwind-4-38bdf8) ![Llama 3.3 70B](https://img.shields.io/badge/Llama_3.3-70B-8b5cf6)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## ✨ Features
+
+- **Bug detection** — finds critical / warning / info-level issues with line numbers.
+- **Why explanations** — every bug comes with an *educational* explanation, not just "this is wrong".
+- **Big-O complexity analysis** — time + space complexity with the bottleneck called out.
+- **Quality scoring** — 0–100 scores for readability, performance, security, maintainability and an overall grade.
+- **Optimized version** — refactored, working code in the same language with notes on what changed.
+- **15+ languages** — Python, JavaScript, TypeScript, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, SQL, and more.
+- **Beautiful UI** — Monaco editor, animated gradients, glassmorphism, smooth Framer-Motion transitions.
+- **Downloadable Markdown report** — handy for assignments and code-review records.
+
+## 🧠 How the AI works
+
+CodeSage sends your code to **Llama 3.3 70B** running on **Groq**'s ultra-low-latency LPU infrastructure. A carefully engineered system prompt forces the model to respond with strict JSON describing:
+
+- detected language
+- a list of bugs (severity, line, category, description, *why*, fix)
+- complexity (time + space) with explanation and bottleneck
+- quality scores
+- an optimized rewrite of the code with change notes
+
+The server normalizes and validates the response, then the React UI renders it as a tabbed analysis panel.
+
+## 🏗️ Architecture
+
+```
+┌──────────────────────────┐         ┌──────────────────────────┐
+│      Next.js Client      │◀──────▶│    Next.js API Route     │
+│  (React 19 + Monaco UI)  │  JSON   │   /api/analyze (Node)    │
+└──────────────────────────┘         └────────────┬─────────────┘
+                                                  │ groq-sdk
+                                                  ▼
+                                     ┌──────────────────────────┐
+                                     │   Groq · Llama 3.3 70B   │
+                                     └──────────────────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **UI:** `src/app/page.tsx` + `src/components/*` (client components, Framer Motion animations)
+- **Editor:** Monaco (`@monaco-editor/react`) with custom CodeSage dark theme
+- **Backend:** `src/app/api/analyze/route.ts` — Node runtime, JSON-only response, safe error handling
+- **LLM:** `src/lib/prompt.ts` — strict JSON system prompt + user prompt builder
+- **Types:** `src/lib/types.ts` — fully typed with TypeScript
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Getting started
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# 1. Install dependencies
+npm install
 
-## Learn More
+# 2. Configure your Groq key
+cp .env.example .env.local
+# then edit .env.local and paste your GROQ_API_KEY
+# (free key at https://console.groq.com/keys)
 
-To learn more about Next.js, take a look at the following resources:
+# 3. Start the dev server
+npm run dev
+# open http://localhost:3000
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Production build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build
+npm start
+```
 
-## Deploy on Vercel
+### Environment variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Var             | Required | Description                                              |
+| --------------- | -------- | -------------------------------------------------------- |
+| `GROQ_API_KEY`  | yes      | Your Groq API key                                        |
+| `GROQ_MODEL`    | no       | Model id (default `llama-3.3-70b-versatile`)             |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📦 Tech stack
+
+| Layer       | Choice                                                |
+| ----------- | ----------------------------------------------------- |
+| Framework   | Next.js 16 (App Router) + React 19                    |
+| Language    | TypeScript                                            |
+| Styling     | Tailwind CSS 4 + custom glassmorphism                 |
+| Animations  | Framer Motion                                         |
+| Editor      | Monaco (`@monaco-editor/react`)                       |
+| Icons       | lucide-react                                          |
+| LLM SDK     | `groq-sdk` (OpenAI-compatible)                        |
+| Deploy      | Vercel-style static + edge / any Node host            |
+
+## 🧪 Try it instantly
+
+The home page comes preloaded with three buggy samples (Python fibonacci, JS async race, C++ buffer overflow) so you can see the reviewer in action before pasting your own code.
+
+## 📁 Project structure
+
+```
+codesage/
+├─ src/
+│  ├─ app/
+│  │  ├─ api/analyze/route.ts   ← Groq-powered analysis endpoint
+│  │  ├─ globals.css            ← Tailwind + custom theme
+│  │  ├─ layout.tsx
+│  │  └─ page.tsx
+│  ├─ components/               ← UI components (Hero, Editor, AnalysisPanel, …)
+│  └─ lib/
+│     ├─ prompt.ts              ← LLM system + user prompts
+│     ├─ types.ts               ← shared interfaces
+│     └─ utils.ts
+├─ .env.example
+├─ next.config.ts
+└─ package.json
+```
+
+## 🗺️ Roadmap / limitations
+
+- Larger code → chunked analysis (currently capped at 20,000 chars).
+- Multi-file project review.
+- Inline highlighting on the original editor (currently shows line numbers in bug cards).
+- User accounts + history.
+- Streaming responses for faster feedback.
+
+## 📄 License
+
+MIT — built for educational / university-project use.
