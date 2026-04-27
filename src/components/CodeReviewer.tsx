@@ -163,14 +163,14 @@ export function CodeReviewer() {
             transition={{ duration: 0.5 }}
             className="glass-strong flex flex-col overflow-hidden rounded-2xl"
           >
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-violet-200/50 px-4 py-3">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-500 shadow-md shadow-violet-500/30">
                   <FileCode className="h-4 w-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold leading-tight">Your code</h3>
-                  <p className="text-[11px] text-white/50">
+                  <h3 className="text-sm font-semibold leading-tight text-slate-900">Your code</h3>
+                  <p className="text-[11px] text-slate-500">
                     {code.length.toLocaleString()} chars · {code.split("\n").length}{" "}
                     lines
                   </p>
@@ -180,7 +180,7 @@ export function CodeReviewer() {
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value as SupportedLanguage)}
-                  className="rounded-lg border border-white/10 bg-black/40 px-2.5 py-1.5 text-xs font-medium text-white outline-none transition-colors hover:bg-black/60 focus:border-violet-400/50"
+                  className="rounded-lg border border-violet-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 outline-none transition-colors hover:bg-violet-50 focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
                 >
                   {SUPPORTED_LANGUAGES.map((l) => (
                     <option key={l} value={l}>
@@ -191,7 +191,7 @@ export function CodeReviewer() {
                 <div className="relative">
                   <button
                     onClick={() => setShowSamples((v) => !v)}
-                    className="flex items-center gap-1 rounded-lg border border-white/10 bg-black/40 px-2.5 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10 transition-colors"
+                    className="flex items-center gap-1 rounded-lg border border-violet-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-violet-50 transition-colors"
                   >
                     Samples
                     <ChevronDown className="h-3 w-3" />
@@ -202,7 +202,7 @@ export function CodeReviewer() {
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
-                        className="absolute right-0 top-full z-50 mt-1.5 w-64 overflow-hidden rounded-xl border border-white/10 bg-zinc-950/95 p-1 shadow-xl backdrop-blur"
+                        className="absolute right-0 top-full z-50 mt-1.5 w-64 overflow-hidden rounded-xl border border-violet-200 bg-white p-1 shadow-xl ring-1 ring-violet-200/50"
                       >
                         {Object.entries(SAMPLES).map(([name, s]) => (
                           <button
@@ -212,7 +212,7 @@ export function CodeReviewer() {
                               setLanguage(s.language);
                               setShowSamples(false);
                             }}
-                            className="block w-full rounded-lg px-3 py-2 text-left text-xs text-white/80 hover:bg-white/5"
+                            className="block w-full rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-violet-50 hover:text-violet-700"
                           >
                             {name}
                           </button>
@@ -221,7 +221,7 @@ export function CodeReviewer() {
                     )}
                   </AnimatePresence>
                 </div>
-                <label className="flex cursor-pointer items-center gap-1 rounded-lg border border-white/10 bg-black/40 px-2.5 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10 transition-colors">
+                <label className="flex cursor-pointer items-center gap-1 rounded-lg border border-violet-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-violet-50 transition-colors">
                   <Upload className="h-3.5 w-3.5" />
                   Upload
                   <input
@@ -237,7 +237,8 @@ export function CodeReviewer() {
                 </label>
                 <button
                   onClick={() => setCode("")}
-                  className="flex items-center gap-1 rounded-lg border border-white/10 bg-black/40 px-2.5 py-1.5 text-xs font-medium text-white/80 hover:bg-rose-500/15 hover:text-rose-300 transition-colors"
+                  className="flex items-center gap-1 rounded-lg border border-violet-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-colors"
+                  title="Clear editor"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -253,11 +254,11 @@ export function CodeReviewer() {
               />
             </div>
 
-            <div className="border-t border-white/5 p-4">
+            <div className="border-t border-violet-200/50 p-4">
               <button
                 onClick={analyze}
                 disabled={loading || !code.trim()}
-                className="shine relative flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-5 py-3 text-sm font-semibold text-white shadow-xl shadow-violet-500/30 transition-all hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                className="shine relative flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 px-5 py-3 text-sm font-semibold text-white shadow-xl shadow-violet-500/40 transition-all hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
               >
                 {loading ? (
                   <>
@@ -271,7 +272,7 @@ export function CodeReviewer() {
                   </>
                 )}
               </button>
-              <p className="mt-2 text-center text-[11px] text-white/40">
+              <p className="mt-2 text-center text-[11px] text-slate-500">
                 Press the button — analysis takes a few seconds. Up to 20,000 chars.
               </p>
             </div>
@@ -288,16 +289,16 @@ export function CodeReviewer() {
                   exit={{ opacity: 0 }}
                   className="glass-strong flex h-full flex-col items-center justify-center rounded-2xl p-8 text-center"
                 >
-                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-rose-500/10">
-                    <AlertCircle className="h-6 w-6 text-rose-400" />
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-rose-100">
+                    <AlertCircle className="h-6 w-6 text-rose-600" />
                   </div>
-                  <h3 className="text-lg font-semibold text-rose-300">
+                  <h3 className="text-lg font-semibold text-rose-700">
                     Couldn&apos;t analyse
                   </h3>
-                  <p className="mt-1 max-w-sm text-sm text-white/60">{error}</p>
+                  <p className="mt-1 max-w-sm text-sm text-slate-600">{error}</p>
                   <button
                     onClick={analyze}
-                    className="mt-4 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 hover:bg-white/10"
+                    className="mt-4 rounded-lg border border-violet-200 bg-white px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-50 transition-colors"
                   >
                     Retry
                   </button>
@@ -313,13 +314,13 @@ export function CodeReviewer() {
                   className="glass-strong flex h-full flex-col items-center justify-center rounded-2xl p-8 text-center"
                 >
                   <div className="relative mb-4">
-                    <div className="absolute inset-0 animate-ping rounded-full bg-violet-500/20" />
-                    <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-xl shadow-violet-500/40">
+                    <div className="absolute inset-0 animate-ping rounded-full bg-violet-400/40" />
+                    <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 shadow-xl shadow-violet-500/40">
                       <Sparkles className="h-7 w-7 text-white" />
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold">CodeSage is thinking…</h3>
-                  <p className="mt-1 max-w-sm text-sm text-white/60">
+                  <h3 className="text-lg font-semibold text-slate-900">CodeSage is thinking…</h3>
+                  <p className="mt-1 max-w-sm text-sm text-slate-600">
                     Reading your code, hunting for bugs, calculating complexity, and
                     drafting an optimized version.
                   </p>
@@ -327,7 +328,7 @@ export function CodeReviewer() {
                     {[0, 1, 2].map((i) => (
                       <span
                         key={i}
-                        className="h-2 w-2 rounded-full bg-violet-400"
+                        className="h-2 w-2 rounded-full bg-violet-500"
                         style={{
                           animation: `bounce 1s infinite ease-in-out ${i * 0.15}s`,
                         }}
@@ -358,13 +359,13 @@ export function CodeReviewer() {
                   exit={{ opacity: 0 }}
                   className="glass-strong flex h-full flex-col items-center justify-center rounded-2xl p-8 text-center"
                 >
-                  <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 ring-1 ring-violet-400/30">
-                    <Sparkles className="h-6 w-6 text-violet-300" />
+                  <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-100 ring-1 ring-violet-300/60">
+                    <Sparkles className="h-6 w-6 text-violet-600" />
                   </div>
-                  <h3 className="text-lg font-semibold">Ready to review</h3>
-                  <p className="mt-1 max-w-sm text-sm text-white/60">
+                  <h3 className="text-lg font-semibold text-slate-900">Ready to review</h3>
+                  <p className="mt-1 max-w-sm text-sm text-slate-600">
                     Paste your code on the left, pick a language, then hit{" "}
-                    <em className="not-italic font-semibold text-white/85">
+                    <em className="not-italic font-semibold text-slate-900">
                       Review my code
                     </em>{" "}
                     — you&apos;ll get bugs, Big-O complexity, a quality score, and an

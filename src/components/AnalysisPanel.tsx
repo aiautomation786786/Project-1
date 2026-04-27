@@ -16,6 +16,7 @@ import { cn, scoreColor } from "@/lib/utils";
 import { BugList } from "./BugList";
 import { ScoreRing } from "./ScoreRing";
 import { CodeEditor } from "./CodeEditor";
+import { downloadPdfReport } from "@/lib/pdfReport";
 
 type Tab = "overview" | "bugs" | "complexity" | "optimized";
 
@@ -41,14 +42,7 @@ export function AnalysisPanel({ result }: Props) {
   };
 
   const handleDownloadReport = () => {
-    const md = buildMarkdownReport(result);
-    const blob = new Blob([md], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `codesage-report-${Date.now()}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadPdfReport(result);
   };
 
   return (
@@ -58,7 +52,7 @@ export function AnalysisPanel({ result }: Props) {
       transition={{ duration: 0.5 }}
       className="glass-strong flex h-full flex-col overflow-hidden rounded-2xl"
     >
-      <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
+      <div className="flex items-center justify-between border-b border-violet-200/50 px-4 py-3">
         <div className="flex flex-wrap items-center gap-1">
           {TABS.map((t) => {
             const active = tab === t.id;
@@ -69,21 +63,21 @@ export function AnalysisPanel({ result }: Props) {
                 className={cn(
                   "relative flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
                   active
-                    ? "text-white"
-                    : "text-white/55 hover:text-white/85 hover:bg-white/5",
+                    ? "text-violet-700"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-violet-50",
                 )}
               >
                 {active && (
                   <motion.span
                     layoutId="tab-indicator"
-                    className="absolute inset-0 rounded-lg bg-gradient-to-br from-violet-500/30 to-fuchsia-500/20 ring-1 ring-violet-400/30"
+                    className="absolute inset-0 rounded-lg bg-gradient-to-br from-violet-100 to-fuchsia-100 ring-1 ring-violet-300"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
                 <t.icon className="relative h-3.5 w-3.5" />
                 <span className="relative">{t.label}</span>
                 {t.id === "bugs" && result.bugs.length > 0 && (
-                  <span className="relative rounded-full bg-rose-500/20 px-1.5 text-[10px] font-bold text-rose-300 ring-1 ring-rose-500/30">
+                  <span className="relative rounded-full bg-rose-100 px-1.5 text-[10px] font-bold text-rose-700 ring-1 ring-rose-300">
                     {result.bugs.length}
                   </span>
                 )}
@@ -93,11 +87,11 @@ export function AnalysisPanel({ result }: Props) {
         </div>
         <button
           onClick={handleDownloadReport}
-          className="hidden sm:flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/10 hover:text-white transition-colors"
-          title="Download analysis as Markdown"
+          className="hidden sm:flex items-center gap-1.5 rounded-lg border border-violet-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-violet-50 hover:text-violet-700 hover:border-violet-300 transition-colors"
+          title="Download analysis as PDF"
         >
           <Download className="h-3.5 w-3.5" />
-          Report
+          PDF
         </button>
       </div>
 
@@ -115,11 +109,11 @@ export function AnalysisPanel({ result }: Props) {
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
                 <ScoreRing score={result.scores.overall} label="Overall" />
                 <div className="flex-1">
-                  <div className="mb-1 inline-flex items-center gap-2 rounded-full bg-white/5 px-2.5 py-0.5 text-[10px] uppercase tracking-widest text-white/60">
+                  <div className="mb-1 inline-flex items-center gap-2 rounded-full bg-violet-100 px-2.5 py-0.5 text-[10px] uppercase tracking-widest font-bold text-violet-700">
                     {result.language}
                   </div>
-                  <h3 className="text-xl font-semibold">Summary</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-white/75">
+                  <h3 className="text-xl font-bold text-slate-900">Summary</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-700">
                     {result.summary}
                   </p>
                 </div>
@@ -144,7 +138,7 @@ export function AnalysisPanel({ result }: Props) {
                       >
                         {val}
                       </div>
-                      <div className="text-[10px] uppercase tracking-widest text-white/55">
+                      <div className="text-[10px] uppercase tracking-widest font-bold text-slate-500">
                         {s.label}
                       </div>
                     </div>
@@ -153,33 +147,33 @@ export function AnalysisPanel({ result }: Props) {
               </div>
 
               <div className="glass rounded-xl p-4">
-                <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-widest text-white/55">
+                <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-slate-500">
                   <Gauge className="h-3.5 w-3.5" />
                   Complexity at a glance
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-lg bg-sky-500/15 px-2.5 py-1 text-sm font-mono font-semibold text-sky-300 ring-1 ring-sky-500/30">
+                  <span className="rounded-lg bg-sky-100 px-2.5 py-1 text-sm font-mono font-bold text-sky-700 ring-1 ring-sky-300">
                     Time {result.complexity.time}
                   </span>
-                  <span className="rounded-lg bg-violet-500/15 px-2.5 py-1 text-sm font-mono font-semibold text-violet-300 ring-1 ring-violet-500/30">
+                  <span className="rounded-lg bg-violet-100 px-2.5 py-1 text-sm font-mono font-bold text-violet-700 ring-1 ring-violet-300">
                     Space {result.complexity.space}
                   </span>
                 </div>
               </div>
 
-              <div className="rounded-xl bg-white/[0.02] p-4 ring-1 ring-white/5">
-                <div className="mb-1.5 text-xs uppercase tracking-widest text-white/55">
+              <div className="rounded-xl bg-white p-4 ring-1 ring-violet-200/60">
+                <div className="mb-1.5 text-xs uppercase tracking-widest font-bold text-slate-500">
                   Issues found
                 </div>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold text-slate-900">
                   {result.bugs.length}{" "}
-                  <span className="text-base font-medium text-white/55">
+                  <span className="text-base font-medium text-slate-500">
                     {result.bugs.length === 1 ? "issue" : "issues"}
                   </span>
                 </div>
                 <button
                   onClick={() => setTab("bugs")}
-                  className="mt-2 text-xs font-medium text-violet-300 hover:text-violet-200 transition-colors"
+                  className="mt-2 text-xs font-semibold text-violet-700 hover:text-violet-900 transition-colors"
                 >
                   See all bugs →
                 </button>
@@ -210,39 +204,39 @@ export function AnalysisPanel({ result }: Props) {
             >
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="glass rounded-xl p-4">
-                  <div className="text-[10px] uppercase tracking-widest text-white/55">
+                  <div className="text-[10px] uppercase tracking-widest font-bold text-slate-500">
                     Time complexity
                   </div>
-                  <div className="mt-1 font-mono text-3xl font-bold text-sky-300">
+                  <div className="mt-1 font-mono text-3xl font-bold text-sky-700">
                     {result.complexity.time}
                   </div>
                 </div>
                 <div className="glass rounded-xl p-4">
-                  <div className="text-[10px] uppercase tracking-widest text-white/55">
+                  <div className="text-[10px] uppercase tracking-widest font-bold text-slate-500">
                     Space complexity
                   </div>
-                  <div className="mt-1 font-mono text-3xl font-bold text-violet-300">
+                  <div className="mt-1 font-mono text-3xl font-bold text-violet-700">
                     {result.complexity.space}
                   </div>
                 </div>
               </div>
 
               <div className="glass rounded-xl p-4">
-                <h4 className="mb-2 text-xs uppercase tracking-widest text-white/55">
+                <h4 className="mb-2 text-xs uppercase tracking-widest font-bold text-slate-500">
                   Explanation
                 </h4>
-                <p className="text-sm leading-relaxed text-white/80">
+                <p className="text-sm leading-relaxed text-slate-700">
                   {result.complexity.explanation}
                 </p>
               </div>
 
               {result.complexity.bottleneck && (
-                <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
-                  <h4 className="mb-1 flex items-center gap-1.5 text-xs uppercase tracking-widest text-amber-300">
+                <div className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+                  <h4 className="mb-1 flex items-center gap-1.5 text-xs uppercase tracking-widest font-bold text-amber-700">
                     <Gauge className="h-3.5 w-3.5" />
                     Bottleneck
                   </h4>
-                  <p className="text-sm leading-relaxed text-amber-100/90">
+                  <p className="text-sm leading-relaxed text-amber-900">
                     {result.complexity.bottleneck}
                   </p>
                 </div>
@@ -260,16 +254,16 @@ export function AnalysisPanel({ result }: Props) {
               className="space-y-3"
             >
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-white">
+                <h4 className="text-sm font-semibold text-slate-900">
                   Optimized version
                 </h4>
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+                  className="flex items-center gap-1.5 rounded-lg border border-violet-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-violet-50 hover:text-violet-700 hover:border-violet-300 transition-colors"
                 >
                   {copied ? (
                     <>
-                      <Check className="h-3.5 w-3.5 text-emerald-400" />
+                      <Check className="h-3.5 w-3.5 text-emerald-600" />
                       Copied
                     </>
                   ) : (
@@ -289,10 +283,10 @@ export function AnalysisPanel({ result }: Props) {
               />
               {result.optimizedCodeNotes && (
                 <div className="glass rounded-xl p-4">
-                  <h4 className="mb-2 text-xs uppercase tracking-widest text-white/55">
+                  <h4 className="mb-2 text-xs uppercase tracking-widest font-bold text-slate-500">
                     What changed
                   </h4>
-                  <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-white/80">
+                  <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-slate-700">
                     {result.optimizedCodeNotes}
                   </pre>
                 </div>
@@ -305,53 +299,3 @@ export function AnalysisPanel({ result }: Props) {
   );
 }
 
-function buildMarkdownReport(r: AnalysisResult): string {
-  const lines: string[] = [];
-  lines.push(`# CodeSage Analysis Report`);
-  lines.push("");
-  lines.push(`**Language:** ${r.language}`);
-  lines.push("");
-  lines.push(`## Summary`);
-  lines.push(r.summary);
-  lines.push("");
-  lines.push(`## Quality Scores`);
-  lines.push(`- Overall: **${r.scores.overall}/100**`);
-  lines.push(`- Readability: ${r.scores.readability}/100`);
-  lines.push(`- Performance: ${r.scores.performance}/100`);
-  lines.push(`- Security: ${r.scores.security}/100`);
-  lines.push(`- Maintainability: ${r.scores.maintainability}/100`);
-  lines.push("");
-  lines.push(`## Complexity`);
-  lines.push(`- Time: \`${r.complexity.time}\``);
-  lines.push(`- Space: \`${r.complexity.space}\``);
-  lines.push("");
-  lines.push(r.complexity.explanation);
-  if (r.complexity.bottleneck) {
-    lines.push("");
-    lines.push(`**Bottleneck:** ${r.complexity.bottleneck}`);
-  }
-  lines.push("");
-  lines.push(`## Bugs (${r.bugs.length})`);
-  for (const b of r.bugs) {
-    lines.push("");
-    lines.push(
-      `### ${b.title} _(${b.severity}${b.line !== null ? `, line ${b.line}` : ""})_`,
-    );
-    lines.push(`**Category:** ${b.category}`);
-    lines.push("");
-    lines.push(b.description);
-    lines.push("");
-    lines.push(`**Why:** ${b.why}`);
-    lines.push("");
-    lines.push(`**Fix:** ${b.fix}`);
-  }
-  lines.push("");
-  lines.push(`## Optimized Code`);
-  lines.push("```" + r.language);
-  lines.push(r.optimizedCode);
-  lines.push("```");
-  lines.push("");
-  lines.push(`### Notes`);
-  lines.push(r.optimizedCodeNotes);
-  return lines.join("\n");
-}

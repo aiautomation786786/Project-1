@@ -9,21 +9,21 @@ const STEPS = [
     title: "1. Paste your code",
     body:
       "Drop in a snippet (or upload a file). CodeSage supports 15+ languages including Python, JS/TS, Java, C/C++, Go and Rust.",
-    color: "from-violet-500 to-fuchsia-500",
+    color: "from-violet-600 to-fuchsia-500",
   },
   {
     icon: BrainCircuit,
     title: "2. AI reviews it",
     body:
       "Llama 3.3 70B (via Groq) reads it like a senior engineer — finds bugs, explains why they happen, and rewrites the code.",
-    color: "from-sky-500 to-cyan-500",
+    color: "from-sky-600 to-cyan-500",
   },
   {
     icon: FileText,
     title: "3. Learn & improve",
     body:
-      "Browse bugs by severity, see Big-O complexity, copy the optimized version, or download the full report as Markdown.",
-    color: "from-emerald-500 to-lime-500",
+      "Browse bugs by severity, see Big-O complexity, copy the optimized version, or download the full report as PDF.",
+    color: "from-emerald-600 to-lime-500",
   },
 ];
 
@@ -38,10 +38,10 @@ export function HowItWorks() {
           transition={{ duration: 0.6 }}
           className="mb-12 text-center"
         >
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
             How <span className="gradient-text">CodeSage</span> works
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-white/60 sm:text-base">
+          <p className="mx-auto mt-3 max-w-xl text-sm text-slate-600 sm:text-base">
             From paste to professional review in under 10 seconds.
           </p>
         </motion.div>
@@ -61,8 +61,8 @@ export function HowItWorks() {
               >
                 <s.icon className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold">{s.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-white/65">{s.body}</p>
+              <h3 className="text-lg font-semibold text-slate-900">{s.title}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{s.body}</p>
             </motion.div>
           ))}
         </div>
