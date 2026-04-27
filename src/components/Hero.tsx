@@ -20,8 +20,13 @@ export function Hero() {
   };
   const onCtaLeave = () => {
     const el = ctaRef.current;
-    if (el) el.style.transform = "translate(0px, 0px) scale(1)";
+    if (el) el.style.transform = "";
   };
+  const onCtaDown = () => {
+    const el = ctaRef.current;
+    if (el) el.style.transform = "translate(0px, 0px) scale(0.97)";
+  };
+  const onCtaUp = (e: MouseEvent<HTMLAnchorElement>) => onCtaMove(e);
 
   return (
     <section className="relative w-full overflow-hidden pt-16 pb-12 sm:pt-24 sm:pb-20">
@@ -70,7 +75,9 @@ export function Hero() {
               href="#analyze"
               onMouseMove={onCtaMove}
               onMouseLeave={onCtaLeave}
-              className="btn-primary shine relative inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-600 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-violet-500/40 will-change-transform"
+              onMouseDown={onCtaDown}
+              onMouseUp={onCtaUp}
+              className="shine relative inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-600 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-violet-500/40 will-change-transform hover:brightness-110 hover:shadow-2xl hover:shadow-violet-500/50"
               style={{ transition: "transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, filter 0.25s ease" }}
             >
               <Sparkles className="h-4 w-4" />
