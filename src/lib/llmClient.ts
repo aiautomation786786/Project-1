@@ -84,18 +84,21 @@ export async function chatCompletion(
       case "groq":
         return await callOpenAICompatible({
           ...params,
+          providerId: "groq",
           baseUrl: "https://api.groq.com/openai/v1/chat/completions",
           signal: controller.signal,
         });
       case "openai":
         return await callOpenAICompatible({
           ...params,
+          providerId: "openai",
           baseUrl: "https://api.openai.com/v1/chat/completions",
           signal: controller.signal,
         });
       case "deepseek":
         return await callOpenAICompatible({
           ...params,
+          providerId: "deepseek",
           baseUrl: "https://api.deepseek.com/chat/completions",
           signal: controller.signal,
         });
@@ -111,9 +114,71 @@ export async function chatCompletion(
   }
 }
 
+type OpenAICompatibleProvider = "groq" | "openai" | "deepseek";
+
+interface ReasoningShape {
+  // True if temperature / response_format must be omitted.
+  isReasoning: boolean;
+  // True if max_completion_tokens (vs max_tokens) is required.
+  useMaxCompletionTokens: boolean;
+  // True if system messages must be collapsed into the first user turn.
+  collapseSystem: boolean;
+}
+
+function reasoningShape(
+  providerId: OpenAICompatibleProvider,
+  model: string,
+): ReasoningShape {
+  // OpenAI o-series (o1, o1-mini, o1-preview, o3-mini, …): reject
+  // `system` / `temperature` / `response_format`, require
+  // `max_completion_tokens`.
+  if (providerId === "openai" && /^o[1-9](-|$)/i.test(model)) {
+    return {
+      isReasoning: true,
+      useMaxCompletionTokens: true,
+      collapseSystem: true,
+    };
+  }
+  // DeepSeek reasoner: accepts `system` / `messages` like the chat model
+  // but rejects `temperature` and `response_format`. Uses `max_tokens`.
+  if (providerId === "deepseek" && /reasoner/i.test(model)) {
+    return {
+      isReasoning: true,
+      useMaxCompletionTokens: false,
+      collapseSystem: false,
+    };
+  }
+  return {
+    isReasoning: false,
+    useMaxCompletionTokens: false,
+    collapseSystem: false,
+  };
+}
+
 async function callOpenAICompatible(
-  params: ChatCompletionParams & { baseUrl: string; signal: AbortSignal },
+  params: ChatCompletionParams & {
+    providerId: OpenAICompatibleProvider;
+    baseUrl: string;
+    signal: AbortSignal;
+  },
 ): Promise<ChatCompletionResult> {
+  const shape = reasoningShape(params.providerId, params.model);
+  const messages = shape.collapseSystem
+    ? collapseSystemIntoUser(params.messages)
+    : params.messages;
+  const body: Record<string, unknown> = {
+    model: params.model,
+    messages,
+  };
+  if (shape.useMaxCompletionTokens) {
+    body.max_completion_tokens = params.maxTokens ?? 8192;
+  } else {
+    body.max_tokens = params.maxTokens ?? 8192;
+  }
+  if (!shape.isReasoning) {
+    body.temperature = params.temperature ?? 0.2;
+    body.response_format = { type: "json_object" };
+  }
   const result = await postJson<OpenAIChatResponse>(
     params.baseUrl,
     {
@@ -122,13 +187,7 @@ async function callOpenAICompatible(
         "Content-Type": "application/json",
         Authorization: `Bearer ${params.apiKey}`,
       },
-      body: JSON.stringify({
-        model: params.model,
-        messages: params.messages,
-        temperature: params.temperature ?? 0.2,
-        max_tokens: params.maxTokens ?? 4096,
-        response_format: { type: "json_object" },
-      }),
+      body: JSON.stringify(body),
     },
     params.signal,
   );
@@ -137,6 +196,22 @@ async function callOpenAICompatible(
   }
   const text = result.data.choices?.[0]?.message?.content ?? "";
   return { text };
+}
+
+function collapseSystemIntoUser(messages: ChatMessage[]): ChatMessage[] {
+  const sys = messages
+    .filter((m) => m.role === "system")
+    .map((m) => m.content)
+    .join("\n\n");
+  const rest = messages.filter((m) => m.role !== "system");
+  if (!sys) return rest;
+  if (rest.length > 0 && rest[0].role === "user") {
+    return [
+      { role: "user", content: `${sys}\n\n${rest[0].content}` },
+      ...rest.slice(1),
+    ];
+  }
+  return [{ role: "user", content: sys }, ...rest];
 }
 
 async function callAnthropic(
@@ -170,7 +245,7 @@ async function callAnthropic(
         system,
         messages: conv,
         temperature: params.temperature ?? 0.2,
-        max_tokens: params.maxTokens ?? 4096,
+        max_tokens: params.maxTokens ?? 8192,
       }),
     },
     signal,
@@ -213,7 +288,7 @@ async function callGemini(
         contents,
         generationConfig: {
           temperature: params.temperature ?? 0.2,
-          maxOutputTokens: params.maxTokens ?? 4096,
+          maxOutputTokens: params.maxTokens ?? 8192,
           responseMimeType: "application/json",
         },
       }),

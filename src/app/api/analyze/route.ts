@@ -123,7 +123,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<AnalyzeRespon
       model,
       apiKey,
       temperature: 0.2,
-      maxTokens: 4096,
+      maxTokens: 8192,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: buildUserPrompt(code, language) },
