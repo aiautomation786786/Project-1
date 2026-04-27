@@ -84,18 +84,21 @@ export async function chatCompletion(
       case "groq":
         return await callOpenAICompatible({
           ...params,
+          providerId: "groq",
           baseUrl: "https://api.groq.com/openai/v1/chat/completions",
           signal: controller.signal,
         });
       case "openai":
         return await callOpenAICompatible({
           ...params,
+          providerId: "openai",
           baseUrl: "https://api.openai.com/v1/chat/completions",
           signal: controller.signal,
         });
       case "deepseek":
         return await callOpenAICompatible({
           ...params,
+          providerId: "deepseek",
           baseUrl: "https://api.deepseek.com/chat/completions",
           signal: controller.signal,
         });
@@ -111,30 +114,69 @@ export async function chatCompletion(
   }
 }
 
-function isReasoningModel(model: string): boolean {
-  // OpenAI o-series (o1, o1-mini, o1-preview, o3-mini, etc.) reject
-  // `system` role, `temperature`, and `response_format` — they need a
-  // tweaked request shape.
-  return /^o[1-9](-|$)/i.test(model);
+type OpenAICompatibleProvider = "groq" | "openai" | "deepseek";
+
+interface ReasoningShape {
+  // True if temperature / response_format must be omitted.
+  isReasoning: boolean;
+  // True if max_completion_tokens (vs max_tokens) is required.
+  useMaxCompletionTokens: boolean;
+  // True if system messages must be collapsed into the first user turn.
+  collapseSystem: boolean;
+}
+
+function reasoningShape(
+  providerId: OpenAICompatibleProvider,
+  model: string,
+): ReasoningShape {
+  // OpenAI o-series (o1, o1-mini, o1-preview, o3-mini, …): reject
+  // `system` / `temperature` / `response_format`, require
+  // `max_completion_tokens`.
+  if (providerId === "openai" && /^o[1-9](-|$)/i.test(model)) {
+    return {
+      isReasoning: true,
+      useMaxCompletionTokens: true,
+      collapseSystem: true,
+    };
+  }
+  // DeepSeek reasoner: accepts `system` / `messages` like the chat model
+  // but rejects `temperature` and `response_format`. Uses `max_tokens`.
+  if (providerId === "deepseek" && /reasoner/i.test(model)) {
+    return {
+      isReasoning: true,
+      useMaxCompletionTokens: false,
+      collapseSystem: false,
+    };
+  }
+  return {
+    isReasoning: false,
+    useMaxCompletionTokens: false,
+    collapseSystem: false,
+  };
 }
 
 async function callOpenAICompatible(
-  params: ChatCompletionParams & { baseUrl: string; signal: AbortSignal },
+  params: ChatCompletionParams & {
+    providerId: OpenAICompatibleProvider;
+    baseUrl: string;
+    signal: AbortSignal;
+  },
 ): Promise<ChatCompletionResult> {
-  const reasoning = isReasoningModel(params.model);
-  // Reasoning models: collapse system messages into a leading user turn.
-  const messages = reasoning
+  const shape = reasoningShape(params.providerId, params.model);
+  const messages = shape.collapseSystem
     ? collapseSystemIntoUser(params.messages)
     : params.messages;
   const body: Record<string, unknown> = {
     model: params.model,
     messages,
   };
-  if (reasoning) {
+  if (shape.useMaxCompletionTokens) {
     body.max_completion_tokens = params.maxTokens ?? 8192;
   } else {
-    body.temperature = params.temperature ?? 0.2;
     body.max_tokens = params.maxTokens ?? 8192;
+  }
+  if (!shape.isReasoning) {
+    body.temperature = params.temperature ?? 0.2;
     body.response_format = { type: "json_object" };
   }
   const result = await postJson<OpenAIChatResponse>(
