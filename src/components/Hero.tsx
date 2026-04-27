@@ -23,10 +23,14 @@ export function Hero() {
     if (el) el.style.transform = "";
   };
   const onCtaDown = () => {
+    if (reduce) return;
     const el = ctaRef.current;
     if (el) el.style.transform = "translate(0px, 0px) scale(0.97)";
   };
-  const onCtaUp = (e: MouseEvent<HTMLAnchorElement>) => onCtaMove(e);
+  const onCtaUp = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (reduce) return;
+    onCtaMove(e);
+  };
 
   return (
     <section className="relative w-full overflow-hidden pt-16 pb-12 sm:pt-24 sm:pb-20">
