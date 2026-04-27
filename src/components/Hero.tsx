@@ -23,7 +23,7 @@ export function Hero() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-500 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-600" />
             </span>
-            Powered by Llama 3.3 70B via Groq
+            AI-Powered Code Intelligence
           </motion.div>
 
           <h1 className="max-w-5xl text-balance text-4xl font-bold tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
@@ -34,10 +34,10 @@ export function Hero() {
           </h1>
 
           <p className="mt-6 max-w-2xl text-balance text-base text-slate-600 sm:text-lg">
-            Paste any code snippet — CodeSage&apos;s AI reviewer detects bugs,
+            Paste any code snippet — Codian&apos;s AI reviewer detects bugs,
             explains <em className="text-slate-900 not-italic font-semibold">why</em> they
             happen, analyses time and space complexity, and rewrites it the optimized
-            way. Built for students learning to code.
+            way. Built for engineers and students who care about clean code.
           </p>
 
           <motion.div

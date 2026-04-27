@@ -43,7 +43,7 @@ function addFooter(c: Cursor) {
   setText(c, COLORS.slate500);
   c.doc.setFont("helvetica", "normal");
   c.doc.setFontSize(9);
-  c.doc.text("CodeSage — AI Code Reviewer & Bug Explainer", MARGIN_X, FOOTER_Y);
+  c.doc.text("Codian — AI Code Reviewer & Bug Explainer", MARGIN_X, FOOTER_Y);
   c.doc.text(`Page ${c.page}`, PAGE_W - MARGIN_X, FOOTER_Y, { align: "right" });
 }
 
@@ -206,7 +206,7 @@ function coverPage(c: Cursor, r: AnalysisResult) {
   c.doc.setFont("helvetica", "bold");
   c.doc.setFontSize(12);
   setText(c, COLORS.violet);
-  c.doc.text("CODESAGE", MARGIN_X, c.y);
+  c.doc.text("CODIAN", MARGIN_X, c.y);
   c.doc.setFont("helvetica", "normal");
   c.doc.setFontSize(11);
   setText(c, COLORS.slate500);
@@ -268,7 +268,7 @@ function coverPage(c: Cursor, r: AnalysisResult) {
   c.doc.setFontSize(9);
   setText(c, COLORS.slate500);
   c.doc.text(
-    `Generated ${new Date().toLocaleString()} \u00B7 Powered by Llama 3.3 70B via Groq`,
+    `Generated ${new Date().toLocaleString()}`,
     MARGIN_X + 16,
     PAGE_H - 110,
   );
@@ -390,5 +390,5 @@ export function generatePdfReport(result: AnalysisResult): jsPDF {
 export function downloadPdfReport(result: AnalysisResult, filename?: string) {
   const doc = generatePdfReport(result);
   const ts = new Date().toISOString().slice(0, 19).replace(/[T:]/g, "-");
-  doc.save(filename ?? `codesage-report-${ts}.pdf`);
+  doc.save(filename ?? `codian-report-${ts}.pdf`);
 }

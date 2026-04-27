@@ -32,7 +32,7 @@ const LANG_TO_MONACO: Record<string, string> = {
 };
 
 function defineThemes(monacoInstance: typeof monaco) {
-  monacoInstance.editor.defineTheme("codesage-light", {
+  monacoInstance.editor.defineTheme("codian-light", {
     base: "vs",
     inherit: true,
     rules: [
@@ -58,7 +58,7 @@ function defineThemes(monacoInstance: typeof monaco) {
       "editorBracketMatch.border": "#7c3aed",
     },
   });
-  monacoInstance.editor.defineTheme("codesage-dark", {
+  monacoInstance.editor.defineTheme("codian-dark", {
     base: "vs-dark",
     inherit: true,
     rules: [
@@ -93,7 +93,7 @@ export function CodeEditor({
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof monaco | null>(null);
   const { resolvedTheme } = useTheme();
-  const themeName = resolvedTheme === "dark" ? "codesage-dark" : "codesage-light";
+  const themeName = resolvedTheme === "dark" ? "codian-dark" : "codian-light";
 
   const handleMount: OnMount = (editor, monacoInstance) => {
     editorRef.current = editor;
