@@ -165,7 +165,7 @@ function codeBlock(c: Cursor, code: string, language: string) {
   const lines = code.split("\n");
   const padding = 10;
   const totalH = lines.length * lineH + padding * 2 + 18;
-  ensureSpace(c, Math.min(totalH, FOOTER_Y - c.y - 30));
+  ensureSpace(c, Math.max(40, Math.min(totalH, FOOTER_Y - c.y - 30)));
 
   setFill(c, COLORS.slate100);
   setStroke(c, COLORS.slate200);
@@ -217,18 +217,19 @@ function coverPage(c: Cursor, r: AnalysisResult) {
   setText(c, COLORS.slate900);
   c.doc.text("Code Analysis Report", MARGIN_X, c.y + 80);
 
+  // Score ring on the right column — drawn first so summary text never overlaps it
+  const ringX = PAGE_W - MARGIN_X - 110;
+  const summaryWidth = ringX - MARGIN_X - 20;
+
   c.doc.setFont("helvetica", "normal");
   c.doc.setFontSize(13);
   setText(c, COLORS.slate700);
-  const summary = c.doc.splitTextToSize(r.summary, PAGE_W - 2 * MARGIN_X) as string[];
+  const summary = c.doc.splitTextToSize(r.summary, summaryWidth) as string[];
   let yy = c.y + 120;
-  for (const line of summary.slice(0, 8)) {
+  for (const line of summary.slice(0, 12)) {
     c.doc.text(line, MARGIN_X, yy);
     yy += 18;
   }
-
-  // Score ring placeholder big number
-  const ringX = PAGE_W - MARGIN_X - 110;
   const ringY = c.y + 200;
   setFill(c, COLORS.white);
   setStroke(c, scoreColor(r.scores.overall));
