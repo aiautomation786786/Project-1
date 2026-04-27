@@ -103,8 +103,7 @@ export function Hero() {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.55 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ y: -4 }}
-                className="glass card-ring card-lift flex flex-col items-center gap-2 rounded-2xl p-4 cursor-default"
+                className="group glass card-ring card-lift flex flex-col items-center gap-2 rounded-2xl p-4 cursor-default"
               >
                 <div
                   className={`flex h-10 w-10 items-center justify-center rounded-xl ${f.bg} transition-transform duration-300 group-hover:scale-110`}
